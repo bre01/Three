@@ -1,6 +1,6 @@
 <template>
     <div id="mainParent">
-        <canvas id="three" @dblclick="onClick"></canvas>
+        <canvas ref="canvas" id="three" @dblclick="onClick"></canvas>
 
         <ShowCanvas v-if="canvasClickedFlag" :thing-to-show="clone"></ShowCanvas>
     </div>
@@ -22,6 +22,11 @@ const light: THREE.AmbientLight = new THREE.AmbientLight(0x999999, 5);
 const loader: GLTFLoader = new GLTFLoader()
 //controls.target.set(0, 0, 0);
 const allObjects:THREE.Group<THREE.Object3DEventMap>[] = [];
+
+
+
+
+
 
 loader.load(
     // resource URL
@@ -45,10 +50,11 @@ loader.load(
 )
 loader.load(
     // resource URL
-    'models/test.glb',
+    'models/test2.glb',
     // called when the resource is loaded
     function (gltf) {
-        //gltf.scene.position.set(0, 0, 0)
+        gltf.scene.position.set(80,80,0)
+
         scene.add(gltf.scene);
         allObjects.push(gltf.scene);
     }, function (xhr) {
@@ -74,15 +80,15 @@ console.log("done");
 let thingToShow:THREE.Group<THREE.Object3DEventMap>|{}=reactive({});
 
 
-
-
+    const animationPosition = ref({ x: 0, y: 0 });
+    const canvasRef = ref(null);
 
 
 
 
 
 const canvasClickedFlag = ref(false);
-let clone: THREE.Group<THREE.Object3DEventMap>;
+let clone: THREE.Group<THREE.Object3DEventMap>|{}=reactive({});
 /*
 function canvasClicked() {
     canvasClickedFlag.value = true;
@@ -94,6 +100,16 @@ const raycaster=new THREE.Raycaster();
 function onClick(event: MouseEvent) {
     // Handle click event
     // ...
+    const canvas=document.getElementById("three") as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      // Set the animation position
+      animationPosition.value = { x, y };
+
+
     canvasClickedFlag.value = true;
   
     var mouse = new THREE.Vector2(
@@ -104,9 +120,10 @@ function onClick(event: MouseEvent) {
 
     raycaster.setFromCamera(mouse, camera)
     console.log(allObjects)
-    var intersects = raycaster.intersectObjects(allObjects, true)//array
+    var intersects = raycaster.intersectObjects(allObjects)//array
     if (intersects.length > 0) {
-        thingToShow= intersects[0].object
+        thingToShow= intersects[0].object.parent?intersects[0].object.parent:intersects[0].object;
+        //thingToShow= intersects[0].object;
         clone = Object.create(
         Object.getPrototypeOf(thingToShow), Object.getOwnPropertyDescriptors(thingToShow)
         );
@@ -121,6 +138,9 @@ function onClick(event: MouseEvent) {
         console.log(target)
         */
     }
+    else{
+        canvasClickedFlag.value=false;
+    }
 }
 onMounted(() => {
 
@@ -131,6 +151,7 @@ onMounted(() => {
     renderer.setSize(600, 600);
     function animate() {
         renderer.render(scene, camera);
+        controls.update();
         fly.update(1)
         requestAnimationFrame(animate);
     }
