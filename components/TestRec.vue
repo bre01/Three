@@ -1,5 +1,4 @@
 <script>
-import { time } from 'console';
 import throttle from '../functions/throttle';
 export default {
     data() {
@@ -12,12 +11,15 @@ export default {
     },
     mounted() {
 
-
+        const setTime=()=>{
+            let d = new Date();
+            this.position.x= d.getTime()%100;
+            this.position.y= d.getTime()%100;
+            console.log(this.position);
+        }
 
         const throttledSet = throttle(() => {
-            this.position.x= time.now()%100;
-            this.position.y= time.now()%100;
-            console.log(this.position);
+            setTime();    
         }, 1000)
         function animate() {
             throttledSet();
@@ -31,5 +33,5 @@ export default {
 }
 </script>
 <template>
-    <Mapdiv :position="position"></Mapdiv>
+    <TestMap :position="position"></TestMap>
 </template>

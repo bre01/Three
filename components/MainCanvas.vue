@@ -4,8 +4,8 @@
 
         <ShowCanvas v-if="canvasClickedFlag" :thing-to-show="clone"></ShowCanvas>
         <ClientOnly>
-
-        <MapDiv :position="positionR?positionR.value:null"></MapDiv>
+         
+        <TestMap :position="positionR?positionR.value:"></TestMap>
         </ClientOnly>
     </div>
 </template>

@@ -1,0 +1,52 @@
+<template>
+    <div id="map"></div>
+    <div style="width: 300px;height:400px">{{ props.position }}</div>
+ </template>
+ <script lang="ts" setup>
+ import * as L from "leaflet";
+ import "leaflet/dist/leaflet.css";
+ import throttle from "../functions/throttle.js";
+ 
+ const props = defineProps(['position']);
+ console.log(props.position)
+ 
+ let mak:L.Marker;
+ onUpdated(()=>{console.log("update");//mak.setLatLng([props.position.x, props.position.y]);
+})
+ 
+ onMounted(() => {
+    const map = L.map('map', {
+       crs: L.CRS.Simple
+    });
+    const bounds = [[0, 0], [300, 300]] as L.LatLngBoundsLiteral;
+    const image = L.imageOverlay("models/download.jpeg", bounds).addTo(map);
+    map.fitBounds(bounds);
+    const sol = L.latLng([150, 150]);
+ 
+    mak = L.marker(sol)
+ 
+    mak.addTo(map);
+    
+ })
+ watch(() => props.position.x, (newPosition) => {
+    console.log(newPosition )
+    console.log("000000000000000000000000")
+    if (mak) {
+       mak.setLatLng([newPosition, newPosition]);
+    }
+ })
+ let thPrint=throttle(()=>{console.log(props.position)},1000);
+ thPrint();
+ 
+ </script>
+ 
+ <style>
+ #map {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+ }
+ </style>
