@@ -28,11 +28,11 @@
     mak.addTo(map);
     
  })
- watch(() => props.position.x, (newPosition) => {
-    console.log(newPosition )
+ watch(props.position, (newPosition) => {
+    console.log(newPosition.x,newPosition.y )
     console.log("000000000000000000000000")
     if (mak) {
-       mak.setLatLng([newPosition, newPosition]);
+       mak.setLatLng([newPosition.x, newPosition.y]);
     }
  })
  let thPrint=throttle(()=>{console.log(props.position)},1000);
