@@ -3,10 +3,13 @@
         <canvas id="three" @dblclick="onClick"></canvas>
 
         <ShowCanvas v-if="canvasClickedFlag" :thing-to-show="clone"></ShowCanvas>
+        <div id="map"> </div>
+        <!--
         <ClientOnly>
 
-        <MapDiv :position="positionR"></MapDiv>
+            <MapDiv :position="positionR"></MapDiv>
         </ClientOnly>
+        -->
     </div>
 </template>
 
@@ -18,6 +21,10 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { ref } from 'vue';
+import * as L from "leaflet";
+import "leaflet/dist/leaflet.css"
+
+
 
 const scene: THREE.Scene = new THREE.Scene();
 const camera: THREE.Camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
@@ -26,7 +33,7 @@ const light: THREE.AmbientLight = new THREE.AmbientLight(0x999999, 5);
 const loader: GLTFLoader = new GLTFLoader()
 //controls.target.set(0, 0, 0);
 const allObjects: THREE.Group<THREE.Object3DEventMap>[] = [];
-let positionR = ref(null);
+let positionR: Ref<THREE.Vector | undefined> = ref();
 
 loader.load(
     // resource URL
@@ -127,6 +134,7 @@ function onClick(event: MouseEvent) {
         */
     }
 }
+let mak:L.Marker;
 
 onMounted(() => {
 
@@ -136,11 +144,33 @@ onMounted(() => {
     const fly = new FlyControls(camera, threeCanvas);
     renderer.setSize(600, 600);
     scene.background = new THREE.Color(0xfff8f0);
-    const throttledSet=throttle(() => {
+    const throttledSet = throttle(() => {
         positionR.value = camera.position;
         console.log(positionR.value);
+        mak.setLatLng(L.latLng([camera.position.x+150,camera.position.y+150]))
+        console.log(mak.getLatLng())
     }, 1000)
+
+
+    //maps
+    const map = L.map('map', {
+        crs: L.CRS.Simple
+    });
+    const bounds = [[0, 0], [300, 300]] as L.LatLngBoundsLiteral;
+    const image = L.imageOverlay("models/download.jpeg", bounds).addTo(map);
+    map.fitBounds(bounds);
+    const sol = L.latLng([150, 150]);
+    mak = L.marker(sol)
     
+
+    mak.addTo(map)
+
+
+
+
+
+
+
     function animate() {
         renderer.render(scene, camera);
         fly.update(1)
@@ -150,7 +180,17 @@ onMounted(() => {
     }
     requestAnimationFrame(animate);
 })
+/*
+watch(() => positionR, (newPosition) => {
+    console.log("changed");
+    console.log(newPosition.value!.x, newPosition.value!.y);
+    if (mak) {
+       mak.setLatLng([newPosition!.x, newPosition!.y]);
+    }
+})
+*/
 </script>
+
 <style>
 #mainParent {
     position: relative;
@@ -161,5 +201,13 @@ onMounted(() => {
     height: 600px;
     background-color: rgb(255, 249, 240);
     position: relative;
+}
+#map {
+   width: 300px;
+   height: 300px;
+   position: absolute;
+   top: 20px;
+   right: 0px;
+   z-index: 100;
 }
 </style>
