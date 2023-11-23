@@ -8,9 +8,10 @@ import "leaflet/dist/leaflet.css";
 import throttle from "../functions/throttle.js";
 
 const props = defineProps(['position']);
-
+console.log(props.position)
 
 let mak:L.Marker;
+onUpdated(()=>{console.log("update")})
 
 onMounted(() => {
    const map = L.map('map', {
