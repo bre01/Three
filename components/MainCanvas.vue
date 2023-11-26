@@ -57,10 +57,11 @@ loader.load(
 )
 loader.load(
     // resource URL
-    'models/test.glb',
+    'models/test2.glb',
     // called when the resource is loaded
     function (gltf) {
         //gltf.scene.position.set(0, 0, 0)
+        gltf.scene.position.set(50,50,30)
         scene.add(gltf.scene);
         allObjects.push(gltf.scene);
     }, function (xhr) {
@@ -83,7 +84,7 @@ cube.position.set(20, 20, 20);
 scene.add(light);
 scene.add(camera);
 console.log("done");
-let thingToShow: THREE.Group<THREE.Object3DEventMap> | {} = reactive({});
+let thingToShow = ref();
 
 
 
@@ -118,9 +119,9 @@ function onClick(event: MouseEvent) {
     console.log(allObjects)
     var intersects = raycaster.intersectObjects(allObjects, true)//array
     if (intersects.length > 0) {
-        thingToShow = intersects[0].object
+        thingToShow.value = intersects[0].object.parent
         clone = Object.create(
-            Object.getPrototypeOf(thingToShow), Object.getOwnPropertyDescriptors(thingToShow)
+            Object.getPrototypeOf(thingToShow.value), Object.getOwnPropertyDescriptors(thingToShow.value)
         );
         console.log("there")
         console.log(thingToShow)
